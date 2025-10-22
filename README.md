@@ -88,7 +88,7 @@ Run hyperparameter tuning and model training:
 
 ```bash
 cd Transformer
-bash Scripts/run_hyperparam_search.sh [number of configurations] [seed for reproducibility]
+bash Scripts/run_hyperparam_search.sh [number of configurations] [seed]
 ```
 
 ---
@@ -168,18 +168,6 @@ Results are stored in:
 ```
 Evaluation/AUC_<DATE>_round2_fold*/
 ```
-
----
-
-## Notes
-
-* All training logs are written to:
-
-  ```
-  logs/train_next_<job>_<jobid>.log
-  ```
-* Evaluation and label-update scripts automatically detect previous evaluation dates.
-* Intermediate model checkpoints and configuration files are stored under `Experiments/`.
 
 ---
 
