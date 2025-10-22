@@ -266,6 +266,22 @@ Evaluation/AUC_<DATE>_round2_fold*/
 
 ---
 
+## Implementation and Computational Resources
+
+The WEST framework is designed to run efficiently on a modern GPU-enabled computing environment. Training and evaluation can be executed either interactively or through SLURM job submissions (recommended for large-scale experiments).
+
+| Task                                   | Recommended GPU                  | Typical Memory | Wall-Time (per round)                     |
+| -------------------------------------- | -------------------------------- | -------------- | ----------------------------------------- |
+| Hyperparameter Search (15–20 configs)  | 1× NVIDIA A100 / V100 / RTX 6000 | 16 GB          | ~6–10 hours total (0.3–0.5 hr per config) |
+| Single-Fold Model Training             | 1× NVIDIA A100 / V100 / RTX 6000 | 16 GB          | ~2–4 hours                                |
+| Evaluation (Validation + Training Set) | 1× GPU or CPU                    | 8 GB           | ~30–60 minutes                            |
+| Silver-Label Update                    | CPU                              | < 4 GB         | ~5 minutes                                |
+| Next-Round Training (3 folds)          | 1× GPU per fold                  | 16 GB each     | ~6–8 hours total                          |
+
+These values assume a cohort of ~15 K patients with ~500 unique clinical codes.
+
+---
+
 ## Citation
 
 If you use WEST in your research, please cite:
