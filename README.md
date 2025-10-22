@@ -52,6 +52,8 @@ Transformer/
 
 ## Environment Setup
 
+All code was implemented in **Python 3.12.11** using **PyTorch** for deep learning and **scikit-learn** for evaluation routines.
+
 ```bash
 conda create -n deeplearning python=3.12
 conda activate deeplearning
