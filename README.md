@@ -1,6 +1,6 @@
-# WEST: WEakly Supervised Transformer for Rare Disease Phenotyping and Subphenotyping
+# WEST: WEakly Supervised Transformer for Rare Disease Phenotyping and Subphenotyping from Electronic Health Records
 
-WEST is a modular, iterative pipeline for weakly supervised EHR model training. It automates hyperparameter search, model evaluation, cross-validation-based model selection, silver-label updating, and retraining across multiple rounds.
+WEST is a framework for data-efficient computational phenotyping and subphenotyping using electronic health records (EHRs). It combines a limited set of expert-validated ("gold-standard") labels with large-scale probabilistic ("silver-standard") labels, which are iteratively refined across training rounds. The provided pipeline automates hyperparameter optimization, model evaluation, cross-validation–based model selection, silver-label refinement, and retraining, enabling fully automated multi-round weakly supervised learning for EHR phenotyping.
 
 ---
 
@@ -16,7 +16,7 @@ Transformer/
 ├── Input/
 │   ├── Embeddings.csv
 │   └── Mapping.csv
-├── logs/
+├── Logs/
 ├── Scripts/
 │   ├── collect_results.py
 │   ├── copy_best_models_auto.sh
