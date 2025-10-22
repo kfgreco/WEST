@@ -10,6 +10,16 @@ Your project directory should be named `Transformer` and organized as follows:
 
 ```
 Transformer/
+├── Data/
+│   ├── Training/
+│   │   ├── [ID].csv
+│   │   └── ...
+│   ├── Validation/
+│   │   ├── [ID].csv
+│   │   └── ...
+│   ├── code_count_statistics.csv
+│   ├── code_similarities.csv
+│   └── patient_summary_round0.csv
 ├── Evaluation/
 ├── Experiments/
 ├── HyperparamSearch/
@@ -62,21 +72,106 @@ pip install torch scikit-learn pandas tqdm jq
 
 ---
 
-## Input Files
+## Input and Data Files
 
-The model requires precomputed embeddings and mapping files located in the `Input/` directory:
+The WEST model requires **precomputed embeddings and code mappings** located in the `Input/` directory, as well as **patient-level data and code summaries** located in the `Data/` directory.
+
+### **1. Patient-Level EHR Files**
+
+Located in:
 
 ```
-Transformer/Input/Embeddings.csv
-Transformer/Input/Mapping.csv
+Transformer/Data/Training/
+Transformer/Data/Validation/
 ```
 
-Model training scripts expect these paths:
+Each file corresponds to a single patient (`[ID].csv`), representing a chronological sequence of medical codes and encounters.
 
-```python
-datax = pd.read_csv('.../Transformer/Input/Embeddings.csv')
-mapping = pd.read_csv('.../Transformer/Input/Mapping.csv')
+**Example (`111111.csv`):**
+
 ```
+"ID","CODE","COUNT","TIME"
+"111111","PheCode:381.2",1,23
+"111111","PheCode:395",1,0
+"111111","LOINC:18768-2",1,29
+"111111","CCS:227",1,29
+"111111","RXNORM:89905",1,2
+```
+
+**Variable descriptions:**
+
+* **ID** — Unique patient identifier.
+* **CODE** — Clinical concept code (e.g., PheCode, LOINC, CCS, RXNORM, etc.) observed during a visit.
+* **COUNT** — Number of times the code appears within a single timepoint or encounter.
+* **TIME** — Temporal ordering index or time interval associated with the event.
+
+These patient-level files are read by the `PatientDataset` class to build input sequences for the transformer model.
+
+---
+
+### **2. `code_count_statistics.csv`**
+
+Aggregated statistics summarizing code usage across the entire cohort.
+
+**Variable descriptions:**
+
+* **CODE** — Medical code identifier (e.g., PheCode, LOINC, CCS, RXNORM, etc.).
+* **total_count** — Total occurrences of the code across all patients.
+* **mean_count** — Average number of occurrences per patient.
+* **variance** — Variance in the count across patients.
+* **std** — Standard deviation of the count distribution.
+* **non_zero_ratio** — Proportion of patients with at least one instance of this code.
+
+---
+
+### **3. `code_similarities.csv`**
+
+Pairwise similarity matrix for medical codes, typically derived from embeddings or co-occurrence statistics.
+
+**Variable descriptions:**
+
+* **code** — Medical code identifier (e.g., PheCode, LOINC, CCS, RXNORM, etc.).
+* **similarity** — Numeric similarity score (e.g., cosine similarity or correlation).
+
+---
+
+### **4. `patient_summary_round0.csv`**
+
+The baseline patient summary file linking demographic or cohort-level metadata with labeling information.
+
+**Variable descriptions:**
+
+* **ID** — Patient identifier linking to the corresponding `[ID].csv` file.
+* **FINALPAH / FINALPAH_gold / FINALPAH_silver** — Binary labels for the target phenotype (gold-standard, silver-standard, or combined).
+* **gold** — 1 if a patient has a gold-standard expert label.
+* **training** — 1 if a patient is included in the training set.
+* **KOMAP_calibrated** — Silver probability used for weak supervision.
+* **kfold_2** — Cross-validation fold assignment (e.g., 1 or 2).
+
+---
+
+### **5. `Embeddings.csv`**
+
+Contains precomputed vector embeddings for each medical code.
+Each row corresponds to one code’s continuous embedding representation.
+
+**Variable descriptions:**
+
+* Each column represents one embedding dimension.
+* Each row corresponds to a code, in the same order as defined in `Mapping.csv`.
+
+Used to initialize the transformer’s code embedding matrix.
+
+---
+
+### **6. `Mapping.csv`**
+
+Maps embedding indices to their corresponding medical code identifiers and categories.
+
+**Variable descriptions:**
+
+* **CODE** — Code identifier (matching those found in the patient-level files).
+* **INDEX** — Row index corresponding to the code’s position in `Embeddings.csv`.
 
 ---
 
@@ -175,9 +270,7 @@ Evaluation/AUC_<DATE>_round2_fold*/
 
 If you use WEST in your research, please cite:
 
-> @article{greco2025weakly,
-  title={A Weakly Supervised Transformer for Rare Disease Diagnosis and Subphenotyping from EHRs with Pulmonary Case Studies},
-  author={Greco, Kimberly F and Yang, Zongxin and Li, Mengyan and Tong, Han and Sweet, Sara Morini and Geva, Alon and Mandl, Kenneth D and Raby, Benjamin A and Cai, Tianxi},
-  journal={arXiv preprint arXiv:2507.02998},
-  year={2025}
-}
+Greco, K. F., Yang, Z., Li, M., Tong, H., Sweet, S. M., Geva, A., Mandl, K. D., Raby, B. A., & Cai, T. (2025).  
+*A Weakly Supervised Transformer for Rare Disease Diagnosis and Subphenotyping from EHRs with Pulmonary Case Studies.*  
+
+**arXiv preprint** [arXiv:2507.02998](https://arxiv.org/abs/2507.02998)
