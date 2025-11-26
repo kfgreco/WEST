@@ -36,7 +36,7 @@ SPLIT="training"
 DEVICE="cuda"
 TOP_K=70
 
-CONFIG="Experiments/${DATE}_round${ROUND}_${FOLD}/config.json"
+CONFIG="Experiments/${DATE}_round1_${FOLD}/config.json"
 MODEL_PATH="Experiments/${DATE}_round${ROUND}_${FOLD}/best_patient_transformer_single.pt"
 OUTPUT_DIR="Evaluation/AUC_${DATE}_round${ROUND}_${FOLD}"
 SUMMARY_FILE_NAME="patient_summary_KOMAP_round${PREV_ROUND}.csv"
