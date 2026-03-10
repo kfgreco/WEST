@@ -290,4 +290,4 @@ If you use WEST in your research, please cite:
 
 Greco, K.F., Yang, Z., Li, M., Tong, H., Morini Sweet, S., Geva, A., Mandl, K.D., Raby, B.A. & Cai, T. (2026). A weakly supervised transformer for rare disease diagnosis and subphenotyping from EHRs with pulmonary case studies. npj Digital Medicine.
 
-**Published Manuscript** [npj Digital Medicine](https://www.nature.com/articles/s41746-026-02406-x)
+**Published Manuscript:** [npj Digital Medicine](https://www.nature.com/articles/s41746-026-02406-x)
