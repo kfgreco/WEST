@@ -274,7 +274,7 @@ The WEST framework is designed to run efficiently on a modern GPU-enabled comput
 
 | Task                                   | Recommended GPU                  | Typical Memory | Wall-Time (per round)                     |
 | -------------------------------------- | -------------------------------- | -------------- | ----------------------------------------- |
-| Hyperparameter Search (15–20 configs)  | 1× NVIDIA A100 / V100 / RTX 6000 | 16 GB          | ~6–10 hours total (0.3–0.5 hr per config) |
+| Hyperparameter Search (15-20 configs)  | 1× NVIDIA A100 / V100 / RTX 6000 | 16 GB          | ~6–10 hours total (0.3–0.5 hr per config) |
 | Single-Fold Model Training             | 1× NVIDIA A100 / V100 / RTX 6000 | 16 GB          | ~2–4 hours                                |
 | Evaluation (Validation + Training Set) | 1× GPU or CPU                    | 8 GB           | ~30–60 minutes                            |
 | Silver-Label Update                    | CPU                              | < 4 GB         | ~5 minutes                                |
@@ -288,7 +288,6 @@ These values assume a cohort of ~15 K patients with ~500 unique clinical codes.
 
 If you use WEST in your research, please cite:
 
-Greco, K. F., Yang, Z., Li, M., Tong, H., Sweet, S. M., Geva, A., Mandl, K. D., Raby, B. A., & Cai, T. (2025).  
-*A Weakly Supervised Transformer for Rare Disease Diagnosis and Subphenotyping from EHRs with Pulmonary Case Studies.*  
+Greco, K.F., Yang, Z., Li, M., Tong, H., Morini Sweet, S., Geva, A., Mandl, K.D., Raby, B.A. & Cai, T. (2026). A weakly supervised transformer for rare disease diagnosis and subphenotyping from EHRs with pulmonary case studies. npj Digital Medicine.
 
-**arXiv preprint** [arXiv:2507.02998](https://arxiv.org/abs/2507.02998)
+**Published Manuscript** [npj Digital Medicine]([https://arxiv.org/abs/2507.02998](https://www.nature.com/articles/s41746-026-02406-x))
