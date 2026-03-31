@@ -201,7 +201,7 @@ python summarize_fold_aucs_sorted_and_overall.py
 bash ../../Scripts/copy_best_models_auto.sh
 ```
 
-This step performs cross-validation-based model selection and copies the top-performing models into:
+This step performs cross-validation-based model selection and copies the top-performing model into:
 
 ```
 Experiments/<DATE>_round1_fold1/
