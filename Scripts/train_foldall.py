@@ -192,8 +192,8 @@ def train_model(args):
     #        Encodes semantic relationships between concepts — concepts with
     #        similar meanings or contexts will have similar vector representations.
 
-    datax = pd.read_csv('.../Transformer/Input/Embeddings.csv')
-    mapping = pd.read_csv('.../Transformer/Input/Mapping.csv')
+    datax = pd.read_csv('./Input/Embeddings.csv')
+    mapping = pd.read_csv('./Input/Mapping.csv')
 
     code_embeddings = torch.tensor(
         datax.iloc[:, 0:(datax.shape[1])].to_numpy(),
