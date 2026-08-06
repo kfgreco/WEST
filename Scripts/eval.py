@@ -87,8 +87,8 @@ def evaluate_model(args):
     # ------------------------------------------------------------------
     # Load embeddings and mapping
     # ------------------------------------------------------------------
-    datax = pd.read_csv("./Input/MUGS_Codified_Python_ARCH_JULY16.csv")
-    mapping = pd.read_csv("./Input/MUGS_Code_Mapping.csv")
+    datax = pd.read_csv("./Input/Embeddings.csv")
+    mapping = pd.read_csv("./Input/Mapping.csv")
     code_embeddings = torch.tensor(datax.to_numpy(), dtype=torch.float32)
 
     # ------------------------------------------------------------------
@@ -124,7 +124,11 @@ def evaluate_model(args):
         num_layers=args.num_layers,
     ).to(device)
 
-    checkpoint = torch.load(args.model_path, map_location=device)
+    # weights_only=False because the checkpoint deliberately stores metadata
+    # (epoch, best_val_auc, optimizer and scheduler state) alongside the tensors.
+    # torch>=2.6 defaults this to True, which rejects any non-tensor object and
+    # makes every checkpoint this pipeline writes unreadable.
+    checkpoint = torch.load(args.model_path, map_location=device, weights_only=False)
     if "ema_state" in checkpoint and checkpoint["ema_state"] is not None:
         print("Loading EMA model parameters...")
         model.load_state_dict(checkpoint["ema_state"])

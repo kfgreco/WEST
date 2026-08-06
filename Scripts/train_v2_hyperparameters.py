@@ -173,7 +173,13 @@ def train_model(args):
         args.world_size = dist.get_world_size()
 
     torch.manual_seed(args.seed + max(args.local_rank, 0))
-    device = torch.device(args.local_rank if args.local_rank != -1 else "cuda")
+    # Honour --device. This previously ignored args.device and hard-coded "cuda",
+    # so --device cpu was accepted and then failed with
+    # "AssertionError: Torch not compiled with CUDA enabled".
+    if args.local_rank != -1:
+        device = torch.device(args.local_rank)
+    else:
+        device = torch.device(args.device)
 
     # ------------------------------------------------------------------
     # Load embeddings and mapping
@@ -200,8 +206,8 @@ def train_model(args):
     #        Encodes semantic relationships between concepts — concepts with
     #        similar meanings or contexts will have similar vector representations.
 
-    datax = pd.read_csv('.../Transformer/Input/Embeddings.csv')
-    mapping = pd.read_csv('.../Transformer/Input/Mapping.csv')
+    datax = pd.read_csv('./Input/Embeddings.csv')
+    mapping = pd.read_csv('./Input/Mapping.csv')
     code_embeddings = torch.tensor(datax.iloc[:, :].to_numpy(), dtype=torch.float32)
     
     # ------------------------------------------------------------------
@@ -412,6 +418,7 @@ def train_model(args):
             print(f"Validation AUC (Fold 2): {val_auc_fold2:.4f}")
 
             def save_best_model(auc_value, best_auc, tag):
+                """Checkpoint if this metric improved. Returns (best_auc, improved)."""
                 if auc_value > best_auc:
                     model_to_save = model.module if args.local_rank != -1 else model
                     torch.save({
@@ -420,15 +427,28 @@ def train_model(args):
                         "optimizer_state_dict": optimizer.state_dict(),
                         "scheduler_state_dict": scheduler.state_dict(),
                         "ema_state": ema.shadow if args.use_ema else None,
-                        "best_val_auc": auc_value,
+                        # float(), not the numpy scalar roc_auc_score returns:
+                        # torch>=2.6 loads with weights_only=True by default, which
+                        # rejects numpy scalars and makes the checkpoint unreadable.
+                        "best_val_auc": float(auc_value),
                     }, f"{args.save_dir}/best_{tag}_{args.model_name}")
                     print(f"New best AUC for {tag}: {auc_value:.4f}")
-                    return auc_value, 0
-                return best_auc, patience_counter + 1
+                    return auc_value, True
+                return best_auc, False
 
-            best_val_auc_fold1, patience_counter = save_best_model(val_auc_fold1, best_val_auc_fold1, "fold1")
-            best_val_auc_fold2, patience_counter = save_best_model(val_auc_fold2, best_val_auc_fold2, "fold2")
-            best_val_auc_all, patience_counter = save_best_model(val_auc_all, best_val_auc_all, "overall")
+            best_val_auc_fold1, _ = save_best_model(val_auc_fold1, best_val_auc_fold1, "fold1")
+            best_val_auc_fold2, _ = save_best_model(val_auc_fold2, best_val_auc_fold2, "fold2")
+            best_val_auc_all, improved_overall = save_best_model(
+                val_auc_all, best_val_auc_all, "overall")
+
+            # Update the patience counter once per epoch, against the metric used
+            # for selection. Previously each save_best_model call reassigned
+            # patience_counter from the stale outer value and the last call won, so
+            # the counter could never exceed 1 and early stopping never fired.
+            if improved_overall:
+                patience_counter = 0
+            else:
+                patience_counter += 1
 
             if patience_counter >= args.early_stopping_patience:
                 print(f"Early stopping triggered after {epoch + 1} epochs")

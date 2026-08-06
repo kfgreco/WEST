@@ -47,7 +47,7 @@ PREV_ROUND=$((NEXT_ROUND - 1))
 # ----------------------------------------------------------------------
 EVAL_DIR="/n/data1/hsph/biostat/celehs/lab/kimgreco/Transformer/Evaluation"
 DATE=$(find "${EVAL_DIR}" -maxdepth 1 -type d -name "AUC_*_round${PREV_ROUND}_fold1" \
-  | head -1 | grep -oP 'AUC_\K[0-9]{8}' || true)
+  | head -1 | sed -n 's/.*AUC_\([0-9]\{8\}\).*/\1/p' || true)
 
 # Fallback to today’s date if not found
 if [ -z "$DATE" ]; then

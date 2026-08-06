@@ -26,7 +26,10 @@ mkdir -p "${LOG_DIR}"
 # Determine round numbers for label update and training
 # ----------------------------------------------------------------------
 # Detect the latest completed evaluation round
-LATEST_EVAL_ROUND=$(ls "${EVAL_DIR}" 2>/dev/null | grep -oP 'round\K[0-9]+' | sort -n | tail -1)
+# NB: POSIX sed, not `grep -oP`. The -P flag is a GNU extension that does not
+# exist on macOS/BSD, where it made this expression return nothing.
+LATEST_EVAL_ROUND=$(ls "${EVAL_DIR}" 2>/dev/null \
+  | sed -n 's/.*round\([0-9][0-9]*\).*/\1/p' | sort -n | tail -1)
 
 if [ -z "$LATEST_EVAL_ROUND" ]; then
   echo "No previous evaluations found. Assuming base Round 0."
@@ -48,12 +51,12 @@ TRAIN_NEXT_ROUND=$((LABEL_NEXT_ROUND + 1))
 # Determine evaluation date for label update
 # ----------------------------------------------------------------------
 DATE=$(find "${EVAL_DIR}" -maxdepth 1 -type d -name "AUC_*_round${LABEL_NEXT_ROUND}_fold1" \
-  | head -1 | grep -oP 'AUC_\K[0-9]{8}' || true)
+  | head -1 | sed -n 's/.*AUC_\([0-9]\{8\}\).*/\1/p' || true)
 
 # Fallback: use most recent evaluation folder if none match
 if [ -z "$DATE" ]; then
   DATE=$(find "${EVAL_DIR}" -maxdepth 1 -type d -name "AUC_*_fold1" \
-    | sort | tail -1 | grep -oP 'AUC_\K[0-9]{8}' || true)
+    | sort | tail -1 | sed -n 's/.*AUC_\([0-9]\{8\}\).*/\1/p' || true)
   echo "No evaluation folder found for round${LABEL_NEXT_ROUND}; using latest available date ${DATE}"
 fi
 
